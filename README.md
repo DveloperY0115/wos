@@ -1,5 +1,6 @@
+# Walk-on-Spheres (WoS)
 
-This is a PyTorch implementation of the Walk-on-Spheres (WoS) algorithms for solving PDEs without discretizing the problem domain using Monte-Carlo estimators.
+This is a Taichi implementation of the Walk-on-Spheres (WoS) algorithms for solving PDEs without discretizing the problem domain using Monte-Carlo estimators.
 This project aims to implement recent methods proposed to solve various PDEs arising in geometry processing.
 
 # Readings
