@@ -1,5 +1,12 @@
 # Walk-on-Spheres (WoS)
 
+<figure>
+    <p align="center">
+        <img src="./media/teaser.png", width="768px">
+    </p>
+</figure>
+
+
 This is a Taichi Lang implementation of the Walk-on-Spheres (WoS) algorithms for solving PDEs without discretizing the problem domain using Monte-Carlo estimators.
 This project aims to implement recent methods proposed to solve various PDEs arising in geometry processing.
 
