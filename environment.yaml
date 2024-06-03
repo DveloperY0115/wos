@@ -64,8 +64,10 @@ dependencies:
   - zlib=1.2.13
   - pip:
       - blessed==1.20.0
+      - colorama==0.4.6
       - contourpy==1.2.1
       - cycler==0.12.1
+      - dill==0.3.8
       - docstring-parser==0.16
       - filelock==3.13.1
       - fonttools==4.52.4
@@ -104,6 +106,7 @@ dependencies:
       - scipy==1.13.1
       - shtab==1.7.1
       - sympy==1.12
+      - taichi==1.7.1
       - torch==2.3.0+cu118
       - torchaudio==2.3.0+cu118
       - torchvision==0.18.0+cu118
