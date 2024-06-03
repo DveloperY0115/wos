@@ -1,0 +1,102 @@
+name: wos
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  # - _libgcc_mutex=0.1
+  # - _openmp_mutex=4.5
+  - asttokens=2.4.1
+  - bzip2=1.0.8
+  - ca-certificates=2024.3.11
+  - comm=0.2.2
+  - debugpy=1.6.7
+  - decorator=5.1.1
+  - exceptiongroup=1.2.0
+  - executing=2.0.1
+  - importlib-metadata=7.1.0
+  - importlib_metadata=7.1.0
+  - ipykernel=6.29.3
+  - ipython=8.24.0
+  - jedi=0.19.1
+  - jupyter_client=8.6.2
+  - jupyter_core=5.7.2
+  # - ld_impl_linux-64=2.38
+  - libffi=3.4.4
+  # - libgcc-ng=13.2.0
+  # - libgomp=13.2.0
+  - libsodium=1.0.18
+  # - libstdcxx-ng=11.2.0
+  - libuuid=1.41.5
+  - matplotlib-inline=0.1.7
+  - ncurses=6.4
+  - nest-asyncio=1.6.0
+  - openssl=3.3.0
+  - packaging=24.0
+  - parso=0.8.4
+  - pexpect=4.9.0
+  - pickleshare=0.7.5
+  - pip=24.0
+  - platformdirs=4.2.2
+  - prompt-toolkit=3.0.42
+  - psutil=5.9.8
+  - ptyprocess=0.7.0
+  - pure_eval=0.2.2
+  - pygments=2.18.0
+  - python=3.10.14
+  - python-dateutil=2.9.0
+  - python_abi=3.10
+  - pyzmq=25.1.2
+  - readline=8.2
+  - setuptools=69.5.1
+  - six=1.16.0
+  - sqlite=3.45.3
+  - stack_data=0.6.2
+  - tk=8.6.14
+  - tornado=6.4
+  - traitlets=5.14.3
+  - typing_extensions=4.11.0
+  - tzdata=2024a
+  - wcwidth=0.2.13
+  - wheel=0.43.0
+  - xz=5.4.6
+  - zeromq=4.3.5
+  - zipp=3.17.0
+  - zlib=1.2.13
+  - pip:
+      - blessed==1.20.0
+      - colorama==0.4.6
+      - contourpy==1.2.1
+      - cycler==0.12.1
+      - dill==0.3.8
+      - docstring-parser==0.16
+      - filelock==3.13.1
+      - fonttools==4.52.4
+      - fsspec==2024.2.0
+      - gpustat==1.1.1
+      - ipympl==0.9.4
+      - ipython-genutils==0.2.0
+      - ipywidgets==8.1.3
+      - jaxtyping==0.2.29
+      - jinja2==3.1.3
+      - jupyterlab-widgets==3.0.11
+      - kiwisolver==1.4.5
+      - libigl==2.5.1
+      - markdown-it-py==3.0.0
+      - markupsafe==2.1.5
+      - matplotlib==3.9.0
+      - mdurl==0.1.2
+      - mpmath==1.3.0
+      - networkx==3.2.1
+      - numpy==1.26.3
+      - pillow==10.2.0
+      - pyparsing==3.1.2
+      - rich==13.7.1
+      - scipy==1.13.1
+      - shtab==1.7.1
+      - sympy==1.12
+      - taichi==1.7.1
+      - typeguard==2.13.3
+      - typing-extensions==4.12.0
+      - tyro==0.8.4
+      - widgetsnbextension==4.0.11
+prefix: /home/dreamy1534/miniconda3/envs/wos
