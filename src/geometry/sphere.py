@@ -4,29 +4,32 @@ sphere.py
 
 from jaxtyping import Shaped, jaxtyped
 import numpy as np
+import taichi as ti
+import taichi.math as tm
 from typeguard import typechecked
 
 
+@ti.dataclass
 class Sphere:
 
-    center: Shaped[np.ndarray, "3"] 
+    center: tm.vec3
     """Center of the sphere"""
-    radius: float
+    radius: ti.f32
     """Radius of the sphere"""
 
-    @jaxtyped(typechecker=typechecked)
     def __init__(
             self,
-            center: Shaped[np.ndarray, "3"],
-            radius: float,
+            center: tm.vec3,
+            radius: ti.f32,
         ):
         self.center = center
         self.radius = radius
 
-    @jaxtyped(typechecker=typechecked)
-    def query(self, x: Shaped[np.ndarray, "N 3"]) -> Shaped[np.ndarray, "N"]:
+    @ti.func
+    def query(self, x: tm.vec3):
         """
         Query the unsigned distance of a point to the sphere
         """
-        d_c2x = np.linalg.norm(x - self.center[None], dim=-1)
-        return np.abs(d_c2x - self.radius)
+        distance = tm.length(x - self.center)
+        distance = distance - self.radius
+        return distance
