@@ -6,13 +6,17 @@ A simple toy experiment for solving heat equation inside a sphere.
 
 from dataclasses import dataclass
 
-from jaxtyping import Shaped, jaxtyped
+from jaxtyping import jaxtyped
 from typeguard import typechecked
 import numpy as np
+import taichi as ti
+import taichi.math as tm
 import tyro
 
 from src.geometry.sphere import Sphere
 
+# Initialize Taichi
+ti.init(arch=ti.gpu)
 
 @dataclass
 class Args:
@@ -33,23 +37,38 @@ class Args:
 
 @jaxtyped(typechecker=typechecked)
 def main(args: Args) -> None:
-    
+
     # Initialize problem domain
-    sphere = Sphere(center=np.zeros(3), radius=args.radius)
+    sphere = Sphere(center=tm.vec3([0.0, 0.0, 0.0]), radius=args.radius)
 
     # Initialize query points
-    xs = np.linspace(-2.0, 2.0, args.img_width)
-    ys = np.linspace(-2.0, 2.0, args.img_height)
-    xx, yy = np.meshgrid(xs, ys, indexing="xy")
+    if False:
+        xs = np.linspace(-2.0, 2.0, args.img_width)
+        ys = np.linspace(-2.0, 2.0, args.img_height)
+        xx, yy = np.meshgrid(xs, ys, indexing="xy")
 
-    # Flatten the query points
-    query_pts = np.stack(
-        [xx.flatten(), yy.flatten(), np.full_like(xx.flatten(), args.z)],
-        axis=1,
-    )
+        # Flatten the query points
+        query_pts = np.stack(
+            [xx.flatten(), yy.flatten(), np.full_like(xx.flatten(), args.z)],
+            axis=1,
+        )
+        query_pts_ = ti.field(dtype=ti.f32, shape=query_pts.shape)
+        query_pts_.from_numpy(query_pts.astype(np.float32))
+        query_pts = query_pts_
+    else:
+        query_pts = ti.Vector.field(3, dtype=ti.f32, shape=(4))
+        query_pts[0] = tm.vec3([1.0, 0.0, 0.0])
+        query_pts[1] = tm.vec3([0.0, 2.0, 0.0])
+        query_pts[2] = tm.vec3([1.0, 1.0, 1.0])
+        query_pts[3] = tm.vec3([0.0, 0.0, 0.0])
+
+    dists = ti.ndarray(dtype=ti.f32, shape=(4))
+    query_sphere(sphere, query_pts, dists)
+    # dists = sphere.query(query_pts)
+    print(dists.to_numpy())
 
     # Recursive call into the walk
-    sol = 
+    # sol = 
 
 
     # for walk_idx in range(args.n_walk):
@@ -57,7 +76,17 @@ def main(args: Args) -> None:
     #     # Query the unsigned distance of the query points to the sphere
     #     dists = sphere.query(query_pts)
 
-
+@ti.kernel
+def query_sphere(
+    sphere: Sphere,
+    query_pts: ti.template(),
+    dists_: ti.types.ndarray(ti.f32, ndim=1),
+):
+    """
+    Query the unsigned distance of a set of points to the sphere
+    """
+    for i in query_pts:
+        dists_[i] = sphere.query(query_pts[i])
 
 
 if __name__ == "__main__":
