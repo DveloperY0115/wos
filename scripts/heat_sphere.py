@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 from jaxtyping import Shaped, jaxtyped
 from typeguard import typechecked
-import torch
+import numpy as np
 import tyro
 
 from src.geometry.sphere import Sphere
@@ -35,17 +35,17 @@ class Args:
 def main(args: Args) -> None:
     
     # Initialize problem domain
-    sphere = Sphere(center=torch.zeros(3), radius=args.radius)
+    sphere = Sphere(center=np.zeros(3), radius=args.radius)
 
     # Initialize query points
-    xs = torch.linspace(-2.0, 2.0, args.img_width)
-    ys = torch.linspace(-2.0, 2.0, args.img_height)
-    xx, yy = torch.meshgrid(xs, ys, indexing="xy")
+    xs = np.linspace(-2.0, 2.0, args.img_width)
+    ys = np.linspace(-2.0, 2.0, args.img_height)
+    xx, yy = np.meshgrid(xs, ys, indexing="xy")
 
     # Flatten the query points
-    query_pts = torch.stack(
-        [xx.flatten(), yy.flatten(), torch.full_like(xx.flatten(), args.z)],
-        dim=1,
+    query_pts = np.stack(
+        [xx.flatten(), yy.flatten(), np.full_like(xx.flatten(), args.z)],
+        axis=1,
     )
 
     # Recursive call into the walk
