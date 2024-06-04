@@ -2,7 +2,7 @@
 
 <figure>
     <p align="center">
-        <img src="./media/teaser.png", width="768px">
+        <img src="./media/teaser_small.png", width="768px">
         <br><em>Credit: <a href="https://www.cs.cmu.edu/~kmcrane/">Keenan Crane - CMU School of Computer Science</a></em>
     </p>
 </figure>
