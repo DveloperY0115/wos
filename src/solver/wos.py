@@ -1,27 +1,40 @@
 """
 wos.py
 
-An implementation of the Walk-on-Spheres algorithm.
+A Taichi implementation of the Walk-on-Spheres algorithm.
 """
 
 from typing import Any
 
-from jaxtyping import Bool, Float, Int, jaxtyped
-from typeguard import typechecked
-import torch
-from torch import Tensor
-import tyro
+import taichi as ti
+
+from src.utils.types import (
+    Scene,
+    VectorField,
+)
 
 
-@jaxtyped(typechecker=typechecked)
+@ti.func
 def wos_step(
-    query_pts: Float[Tensor, "N 3"],
-    scene: Any,
-    iter_idx: int,
-    terminated: Bool[Tensor, "N"],
-    walk_cnt: Int[Tensor, "N"],
-) -> Float[Tensor, "N"]:
+    query_pts: VectorField,
+    scene: Scene,
+    eps: float,
+):
     """
     Takes a single step of the Walk-on-Spheres algorithm.
     """
     pass
+
+@ti.kernel
+def wos(
+    query_pts: VectorField,
+    scene: Scene,
+    eps: float,
+    n_walk: int,
+):
+    """
+    Simulates the Walk-on-Spheres algorithm.
+    """
+    for i in range(query_pts.shape[0]):  # Parallelized
+        for _ in range(n_walk):  # Sequential
+            wos_step(query_pts, scene, eps)
