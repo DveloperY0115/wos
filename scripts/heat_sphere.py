@@ -7,14 +7,15 @@ A simple toy experiment for solving heat equation inside a sphere.
 from dataclasses import dataclass
 
 from jaxtyping import jaxtyped
-from typeguard import typechecked
 import matplotlib.pyplot as plt
 import numpy as np
 import taichi as ti
 import taichi.math as tm
+from typeguard import typechecked
 import tyro
 
 from src.geometry.sphere import Sphere
+from src.solver.wos import wos
 from src.utils.types import (
     VectorField,
     Float1DArray,
@@ -73,13 +74,9 @@ def main(args: Args) -> None:
     plt.show()
 
     # Recursive call into the walk
+    print("Launching walk...")
+    wos(query_pts, sphere, args.eps, args.n_walk)
     # sol = 
-
-    # for walk_idx in range(args.n_walk):
-
-    #     # Query the unsigned distance of the query points to the sphere
-    #     dists = sphere.query(query_pts)
-
 
 
 @ti.kernel
