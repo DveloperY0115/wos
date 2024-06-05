@@ -8,12 +8,17 @@ from dataclasses import dataclass
 
 from jaxtyping import jaxtyped
 from typeguard import typechecked
+import matplotlib.pyplot as plt
 import numpy as np
 import taichi as ti
 import taichi.math as tm
 import tyro
 
 from src.geometry.sphere import Sphere
+from src.utils.types import (
+    VectorField,
+    Float1DArray,
+)
 
 # Initialize Taichi
 ti.init(arch=ti.gpu)
@@ -42,45 +47,46 @@ def main(args: Args) -> None:
     sphere = Sphere(center=tm.vec3([0.0, 0.0, 0.0]), radius=args.radius)
 
     # Initialize query points
-    if False:
-        xs = np.linspace(-2.0, 2.0, args.img_width)
-        ys = np.linspace(-2.0, 2.0, args.img_height)
-        xx, yy = np.meshgrid(xs, ys, indexing="xy")
+    xs = np.linspace(-2.0, 2.0, args.img_width)
+    ys = np.linspace(-2.0, 2.0, args.img_height)
+    xx, yy = np.meshgrid(xs, ys, indexing="xy")
 
-        # Flatten the query points
-        query_pts = np.stack(
-            [xx.flatten(), yy.flatten(), np.full_like(xx.flatten(), args.z)],
-            axis=1,
-        )
-        query_pts_ = ti.field(dtype=ti.f32, shape=query_pts.shape)
-        query_pts_.from_numpy(query_pts.astype(np.float32))
-        query_pts = query_pts_
-    else:
-        query_pts = ti.Vector.field(3, dtype=ti.f32, shape=(4))
-        query_pts[0] = tm.vec3([1.0, 0.0, 0.0])
-        query_pts[1] = tm.vec3([0.0, 2.0, 0.0])
-        query_pts[2] = tm.vec3([1.0, 1.0, 1.0])
-        query_pts[3] = tm.vec3([0.0, 0.0, 0.0])
+    # Flatten the query points
+    query_pts = np.stack(
+        [xx.flatten(), yy.flatten(), np.full_like(xx.flatten(), args.z)],
+        axis=1,
+    )
+    query_pts_ = ti.Vector.field(3, dtype=ti.f32, shape=query_pts.shape[0])
+    query_pts_.from_numpy(query_pts.astype(np.float32))
+    query_pts = query_pts_
 
-    dists = ti.ndarray(dtype=ti.f32, shape=(4))
+    # Query SDF of sphere
+    dists = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
     query_sphere(sphere, query_pts, dists)
-    # dists = sphere.query(query_pts)
-    print(dists.to_numpy())
+    dists = dists.to_numpy()
+
+    # Visualize Signed Distance Field
+    dists = dists.reshape(args.img_height, args.img_width)
+    print("Visualizing SDF of scene. Close the window to continue...")
+    plt.imshow(dists, cmap="coolwarm")
+    plt.colorbar()
+    plt.show()
 
     # Recursive call into the walk
     # sol = 
-
 
     # for walk_idx in range(args.n_walk):
 
     #     # Query the unsigned distance of the query points to the sphere
     #     dists = sphere.query(query_pts)
 
+
+
 @ti.kernel
 def query_sphere(
     sphere: Sphere,
-    query_pts: ti.template(),
-    dists_: ti.types.ndarray(ti.f32, ndim=1),
+    query_pts: VectorField,
+    dists_: Float1DArray,
 ):
     """
     Query the unsigned distance of a set of points to the sphere
