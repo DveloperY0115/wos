@@ -14,6 +14,10 @@ def uniform_sphere(radius: float, center: tm.vec3):
     """
     Implements uniform sampling from a sphere in 3D space.
     """
+    assert radius > 0, (
+        f"The argument `radius` must be positive. Got {radius}."
+    )
+
     eps1 = ti.random(float)
     eps2 = ti.random(float)
 
@@ -26,7 +30,7 @@ def uniform_sphere(radius: float, center: tm.vec3):
 
     # Scale the sample to the desired radius
     sample = radius * tm.vec3([x, y, z])
-    sample = center + radius
+    sample = center + sample
 
     return sample
 
@@ -35,6 +39,10 @@ def uniform_ball(radius: float, center: tm.vec3):
     """
     Implements uniform sampling from a ball in 3D space.
     """
+    assert radius > 0, (
+        f"The argument `radius` must be positive. Got {radius}."
+    )
+
     eps1 = ti.random(float)
     eps2 = ti.random(float)
     eps3 = ti.random(float)
@@ -46,6 +54,6 @@ def uniform_ball(radius: float, center: tm.vec3):
 
     # Scale the sample to the desired radius
     sample = radius * tm.vec3([x, y, z])
-    sample = center + radius
+    sample = center + sample
 
     return sample
