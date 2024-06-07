@@ -8,7 +8,7 @@ import taichi as ti
 import taichi.math as tm
 
 from src.utils.sampling import (
-    uniform_ball,
+    uniform_sphere,
 )
 from src.utils.types import (
     Float1DArray,
@@ -38,9 +38,9 @@ def wos_walk(
         if ti.abs(dist) < eps:
             break
 
-        # Sample a random point on the sphere whose
+        # Sample a random point on a sphere whose
         # radius is the distance to the closest boundary point
-        curr_pt = uniform_ball(ti.abs(dist), curr_pt)
+        curr_pt = uniform_sphere(ti.abs(dist), curr_pt)
 
     # Retrieve the boundary value
     bd_val = scene.query_boundary(curr_pt)
