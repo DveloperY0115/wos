@@ -4,16 +4,13 @@ sampling.py
 A collection of utility functions related to random sampling.
 """
 
-from jaxtyping import jaxtyped
 import numpy as np
 import taichi as ti
 import taichi.math as tm
-from typeguard import typechecked
 
 
-@jaxtyped(typechecker=typechecked)
 @ti.func
-def uniform_sphere(radius: float):
+def uniform_sphere(radius: float, center: tm.vec3):
     """
     Implements uniform sampling from a sphere in 3D space.
     """
@@ -29,12 +26,12 @@ def uniform_sphere(radius: float):
 
     # Scale the sample to the desired radius
     sample = radius * tm.vec3([x, y, z])
+    sample = center + radius
 
     return sample
 
-@jaxtyped(typechecker=typechecked)
 @ti.func
-def uniform_ball(radius: float):
+def uniform_ball(radius: float, center: tm.vec3):
     """
     Implements uniform sampling from a ball in 3D space.
     """
@@ -49,5 +46,6 @@ def uniform_ball(radius: float):
 
     # Scale the sample to the desired radius
     sample = radius * tm.vec3([x, y, z])
+    sample = center + radius
 
     return sample
