@@ -32,13 +32,17 @@ class Args:
 
     z: float = 0.0
     """The z-coordinate of the plane (i.e., slice) to visualize the heat map"""
-    eps: float = 1e-3
+    eps: float = 1e-6
     """Threshold to determine whether a walk has reached the domain boundary"""
-    n_walk: int = 1000
-    """Maximum number of random walks to simulate"""
+    n_walk: int = 2000
+    """Maximum number of random walks for each query point to simulate"""
+    n_step: int = 50
+    """Maximum number of steps for each random walk"""
 
     img_height: int = 256
+    """Height of the image"""
     img_width: int = 256
+    """Width of the image"""
 
 
 @jaxtyped(typechecker=typechecked)
@@ -75,8 +79,14 @@ def main(args: Args) -> None:
 
     # Recursive call into the walk
     print("Launching walk...")
-    wos(query_pts, sphere, args.eps, args.n_walk)
-    # sol = 
+    sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
+    wos(query_pts, sphere, args.eps, args.n_walk, args.n_step, sol)
+    sol = sol.to_numpy()
+    sol = sol.reshape(args.img_height, args.img_width)
+    print("Visualizing solution of scene. Close the window to continue...")
+    plt.imshow(sol, cmap="coolwarm")
+    plt.colorbar()
+    plt.show()
 
 
 @ti.kernel
@@ -89,7 +99,7 @@ def query_sphere(
     Query the unsigned distance of a set of points to the sphere
     """
     for i in query_pts:
-        dists_[i] = sphere.query(query_pts[i])
+        dists_[i] = sphere.query_dist(query_pts[i])
 
 
 if __name__ == "__main__":
