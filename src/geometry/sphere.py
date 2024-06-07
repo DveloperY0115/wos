@@ -2,11 +2,8 @@
 sphere.py
 """
 
-from jaxtyping import Shaped, jaxtyped
-import numpy as np
 import taichi as ti
 import taichi.math as tm
-from typeguard import typechecked
 
 
 @ti.dataclass
@@ -26,10 +23,27 @@ class Sphere:
         self.radius = radius
 
     @ti.func
-    def query(self, x: tm.vec3):
+    def query_dist(self, x: tm.vec3):
         """
-        Query the unsigned distance of a point to the sphere
+        Query the signed distance of a point to the sphere.
         """
         distance = tm.length(x - self.center)
         distance = distance - self.radius
         return distance
+
+    @ti.func
+    def query_boundary(self, x: tm.vec3):
+        """
+        Query the boundary condition defined over the sphere.
+        """
+        bd_val = 0.0
+        if x[0] >= 0 and x[1] >= 0:
+            bd_val = 50.0
+        elif x[0] < 0 and x[1] >= 0:
+            bd_val = 0.0
+        elif x[0] >= 0 and x[1] < 0:
+            bd_val = 0.0
+        else:
+            bd_val = -50.0
+
+        return bd_val
