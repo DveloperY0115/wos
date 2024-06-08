@@ -22,7 +22,7 @@ conda activate wos
 export PYTHONPATH=.
 ```
 
-Check the installation by running a simple example that solves the Laplace equation over a 2-sphere with a Dirichlet boundary condition::
+Check the installation by running a simple example that solves the Laplace equation over a 2-sphere with a Dirichlet boundary condition:
 ```
 python scripts/heat_sphere.py --{no-src-only|src-only}
 ```
