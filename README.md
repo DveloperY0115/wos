@@ -32,23 +32,23 @@ If the installation is successful, the code should display the following images 
 <table>
     <tr>
         <td>
+            <center>
             <figure>
                 <img src="./media/example_heat_bd-only.png", width="378px">
-                <figcaption class="figure-caption text-center">Visualization with '--no-src-only'</figcaption>
+                <figcaption>Visualization with '--no-src-only'</figcaption>
             </figure>
+            </center>
         </td>
         <td>
+            <center>
             <figure>
                 <img src="./media/example_heat_src-only.png", width="378px">
-                <figcaption class="figure-caption text-center">Visualization with '--src-only'.</figcaption>
+                <figcaption>Visualization with '--src-only'.</figcaption>
             </figure>
+            </center>
         </td>
     </tr>
 </table>
-<!-- <figure>
-    <img src="./media/example_heat.png", width="378px">
-</figure> -->
-
 
 # Readings
 This project is greatly inspired by the following papers:
