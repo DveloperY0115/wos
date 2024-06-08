@@ -34,13 +34,13 @@ If the installation is successful, the code should display the following images 
         <td>
             <figure>
                 <img src="./media/example_heat_bd-only.png", width="378px">
-                <figcaption>Visualization with '--no-src-only'</figcaption>
+                <figcaption class="figure-caption text-center">Visualization with '--no-src-only'</figcaption>
             </figure>
         </td>
         <td>
             <figure>
                 <img src="./media/example_heat_src-only.png", width="378px">
-                <figcaption>Visualization with '--src-only'.</figcaption>
+                <figcaption class="figure-caption text-center">Visualization with '--src-only'.</figcaption>
             </figure>
         </td>
     </tr>
