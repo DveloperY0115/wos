@@ -5,7 +5,7 @@ Definitions of types used in the project.
 """
 
 import taichi as ti
-import taichi.math as tm
+
 
 """Struct"""
 Scene = ti.template()  # FIXME: Is this a right way to type a struct?
