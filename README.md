@@ -26,26 +26,18 @@ Check the installation by running a simple example that solves the Laplace equat
 ```
 python scripts/heat_sphere.py --{no-src-only|src-only}
 ```
-The flag `--no-src-only` will solve the PDE with only boundary conditions, while `--src-only` will solve the PDE with only source terms.
-
-If the installation is successful, the code should display the following images on pop-up windows:
+The flag `--no-src-only` will solve the PDE with only boundary conditions, while `--src-only` will solve the PDE with only source terms. When executed, the code should display the following visualization: the left panel shows the solution with only boundary conditions, while the right panel shows the solution with only source terms.
 <table>
     <tr>
         <td>
-            <center>
             <figure>
                 <img src="./media/example_heat_bd-only.png", width="378px">
-                <figcaption>Visualization with '--no-src-only'</figcaption>
             </figure>
-            </center>
         </td>
         <td>
-            <center>
             <figure>
                 <img src="./media/example_heat_src-only.png", width="378px">
-                <figcaption>Visualization with '--src-only'.</figcaption>
             </figure>
-            </center>
         </td>
     </tr>
 </table>
