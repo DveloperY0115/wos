@@ -26,9 +26,10 @@ ti.init(arch=ti.gpu)
 
 @dataclass
 class Args:
-    n_sample: int = 1000
     radius: float = 1.0
-    device: str = "cpu"
+    """Radius of the sphere"""
+    src_only: bool = True
+    """Flag to enable only the source term"""
 
     z: float = 0.0
     """The z-coordinate of the plane (i.e., slice) to visualize the heat map"""
@@ -49,7 +50,11 @@ class Args:
 def main(args: Args) -> None:
 
     # Initialize problem domain
-    sphere = Sphere(center=tm.vec3([0.0, 0.0, 0.0]), radius=args.radius)
+    sphere = Sphere(
+        center=tm.vec3([0.0, 0.0, 0.0]),
+        radius=args.radius,
+        src_only=args.src_only,
+    )
 
     # Initialize query points
     xs = np.linspace(-2.0, 2.0, args.img_width)
@@ -65,41 +70,18 @@ def main(args: Args) -> None:
     query_pts_.from_numpy(query_pts.astype(np.float32))
     query_pts = query_pts_
 
-    # Query SDF of sphere
-    dists = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
-    query_sphere(sphere, query_pts, dists)
-    dists = dists.to_numpy()
-
-    # Visualize Signed Distance Field
-    dists = dists.reshape(args.img_height, args.img_width)
-    print("Visualizing SDF of scene. Close the window to continue...")
-    plt.imshow(dists, cmap="coolwarm")
-    plt.colorbar()
-    plt.show()
-
     # Recursive call into the walk
     print("Launching walk...")
     sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
     wos(query_pts, sphere, args.eps, args.n_walk, args.n_step, sol)
     sol = sol.to_numpy()
     sol = sol.reshape(args.img_height, args.img_width)
+    # print(f"NaN count: {np.isnan(sol).sum()}")
+
     print("Visualizing solution of scene. Close the window to continue...")
     plt.imshow(sol, cmap="coolwarm")
     plt.colorbar()
     plt.show()
-
-
-@ti.kernel
-def query_sphere(
-    sphere: Sphere,
-    query_pts: VectorField,
-    dists_: Float1DArray,
-):
-    """
-    Query the unsigned distance of a set of points to the sphere
-    """
-    for i in query_pts:
-        dists_[i] = sphere.query_dist(query_pts[i])
 
 
 if __name__ == "__main__":

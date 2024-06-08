@@ -7,10 +7,15 @@ A Taichi implementation of the Walk-on-Spheres algorithm.
 import taichi as ti
 import taichi.math as tm
 
-from src.utils.sampling import (
+from ..utils.math_funcs import (
+    harmonic_green_3d,
+    volume_ball,
+)
+from ..utils.sampling import (
+    uniform_ball,
     uniform_sphere,
 )
-from src.utils.types import (
+from ..utils.types import (
     Float1DArray,
     Scene,
     VectorField,
@@ -29,23 +34,32 @@ def wos_walk(
     """
     curr_pt = query_pt
 
+    sol = 0.0
     for _ in range(n_step):
 
         # Compute the distance to the closest boundary point
         dist = scene.query_dist(curr_pt)
+        dist_abs = ti.abs(dist)
 
-        # If distance < eps, terminate the walk
-        if ti.abs(dist) < eps:
+        # Terminate the walk when reached boundary
+        if dist_abs < eps:
             break
+
+        # Accumulate source term
+        src_pt = uniform_ball(dist_abs, curr_pt)
+        src_val = scene.query_source(src_pt)
+        v_ball = volume_ball(dist_abs)
+        sol += v_ball * src_val * harmonic_green_3d(curr_pt, src_pt, dist_abs)
 
         # Sample a random point on a sphere whose
         # radius is the distance to the closest boundary point
-        curr_pt = uniform_sphere(ti.abs(dist), curr_pt)
+        curr_pt = uniform_sphere(dist_abs, curr_pt)
 
     # Retrieve the boundary value
     bd_val = scene.query_boundary(curr_pt)
+    sol += bd_val
 
-    return bd_val
+    return sol
 
 
 @ti.kernel
@@ -65,9 +79,9 @@ def wos(
     """
     for i in range(query_pts.shape[0]):  # Parallelized
         for _ in range(n_walk):  # Sequential
-            bd_val = wos_walk(
+            sol = wos_walk(
                 query_pts[i], scene, n_step, eps
 
             )
-            sol_[i] += bd_val
+            sol_[i] += sol
         sol_[i] /= n_walk
