@@ -24,12 +24,31 @@ export PYTHONPATH=.
 
 Check the installation by running a simple example that solves the Laplace equation over a 2-sphere with a Dirichlet boundary condition::
 ```
-python scripts/heat_sphere.py
+python scripts/heat_sphere.py --{no-src-only|src-only}
 ```
-The code should display the following image:
-<figure>
+The flag `--no-src-only` will solve the PDE with only boundary conditions, while `--src-only` will solve the PDE with only source terms.
+
+If the installation is successful, the code should display the following images on pop-up windows:
+<table>
+    <tr>
+        <td>
+            <figure>
+                <img src="./media/example_heat_bd-only.png", width="378px">
+                <figcaption>Visualization with '--no-src-only'</figcaption>
+            </figure>
+        </td>
+        <td>
+            <figure>
+                <img src="./media/example_heat_src-only.png", width="378px">
+                <figcaption>Visualization with '--src-only'.</figcaption>
+            </figure>
+        </td>
+    </tr>
+</table>
+<!-- <figure>
     <img src="./media/example_heat.png", width="378px">
-</figure>
+</figure> -->
+
 
 # Readings
 This project is greatly inspired by the following papers:
