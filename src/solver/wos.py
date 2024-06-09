@@ -67,7 +67,6 @@ def wos(
     query_pts: VectorField,
     scene: Scene,
     eps: float,
-    n_walk: int,
     n_step: int,
     sol_: Float1DArray,
 ):
@@ -78,10 +77,6 @@ def wos(
     - n_step: The number of maximum steps for each random walk
     """
     for i in range(query_pts.shape[0]):  # Parallelized
-        for _ in range(n_walk):  # Sequential
-            sol = wos_walk(
-                query_pts[i], scene, n_step, eps
-
-            )
-            sol_[i] += sol
-        sol_[i] /= n_walk
+        sol_[i] += wos_walk(
+            query_pts[i], scene, n_step, eps
+        )

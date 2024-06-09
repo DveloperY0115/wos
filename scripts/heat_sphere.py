@@ -5,6 +5,7 @@ A simple toy experiment for solving heat equation inside a sphere.
 """
 
 from dataclasses import dataclass
+import time
 
 from jaxtyping import jaxtyped
 import matplotlib.pyplot as plt
@@ -39,10 +40,12 @@ class Args:
     """Maximum number of random walks for each query point to simulate"""
     n_step: int = 50
     """Maximum number of steps for each random walk"""
+    vis_every: float = 0.01
+    """Time interval between subsequent visualizations"""
 
-    img_height: int = 256
+    img_height: int = 512
     """Height of the image"""
-    img_width: int = 256
+    img_width: int = 512
     """Width of the image"""
 
 
@@ -73,15 +76,32 @@ def main(args: Args) -> None:
     # Recursive call into the walk
     print("Launching walk...")
     sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
-    wos(query_pts, sphere, args.eps, args.n_walk, args.n_step, sol)
-    sol = sol.to_numpy()
-    sol = sol.reshape(args.img_height, args.img_width)
-    # print(f"NaN count: {np.isnan(sol).sum()}")
+    
+    # Initialize GUI
+    gui = ti.GUI("Heat Sphere", (args.img_width, args.img_height))
 
-    print("Visualizing solution of scene. Close the window to continue...")
-    plt.imshow(sol, cmap="coolwarm")
-    plt.colorbar()
-    plt.show()
+    while gui.running:
+        for walk_idx in range(args.n_walk):
+            wos(query_pts, sphere, args.eps, args.n_step, sol)
+            sol = sol.to_numpy()
+            sol = sol.reshape(args.img_height, args.img_width)
+
+            # Visualize the solution
+            sol_vis = sol.copy() / (walk_idx + 1)
+            sol_vis = plt.cm.jet(plt.Normalize()(sol_vis))
+            gui.set_image(sol_vis)
+            gui.show()
+
+            sol = sol.reshape(args.img_height * args.img_width)
+            sol_ = ti.ndarray(dtype=ti.f32, shape=(sol.shape[0]))
+            sol_.from_numpy(sol)
+            sol = sol_
+
+            time.sleep(max(args.vis_every, 0.0))
+
+        # Do not terminate after the simulation
+        gui.set_image(sol_vis)
+        gui.show()
 
 
 if __name__ == "__main__":
