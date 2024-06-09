@@ -36,11 +36,11 @@ class Args:
     """The z-coordinate of the plane (i.e., slice) to visualize the heat map"""
     eps: float = 1e-6
     """Threshold to determine whether a walk has reached the domain boundary"""
-    n_walk: int = 2000
+    n_walk: int = 100000
     """Maximum number of random walks for each query point to simulate"""
     n_step: int = 50
     """Maximum number of steps for each random walk"""
-    vis_every: float = 0.01
+    vis_every: float = 0.0
     """Time interval between subsequent visualizations"""
 
     img_height: int = 512
@@ -72,15 +72,13 @@ def main(args: Args) -> None:
     query_pts_ = ti.Vector.field(3, dtype=ti.f32, shape=query_pts.shape[0])
     query_pts_.from_numpy(query_pts.astype(np.float32))
     query_pts = query_pts_
-
-    # Recursive call into the walk
-    print("Launching walk...")
-    sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
     
     # Initialize GUI
+    print("Launching walk...")
     gui = ti.GUI("Heat Sphere", (args.img_width, args.img_height))
 
     while gui.running:
+        sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
         for walk_idx in range(args.n_walk):
             wos(query_pts, sphere, args.eps, args.n_step, sol)
             sol = sol.to_numpy()
@@ -98,10 +96,6 @@ def main(args: Args) -> None:
             sol = sol_
 
             time.sleep(max(args.vis_every, 0.0))
-
-        # Do not terminate after the simulation
-        gui.set_image(sol_vis)
-        gui.show()
 
 
 if __name__ == "__main__":
