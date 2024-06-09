@@ -86,7 +86,7 @@ def main(args: Args) -> None:
 
             # Visualize the solution
             sol_vis = sol.copy() / (walk_idx + 1)
-            sol_vis = plt.cm.jet(plt.Normalize()(sol_vis))
+            sol_vis = plt.cm.coolwarm(plt.Normalize()(sol_vis))
             gui.set_image(sol_vis)
             gui.show()
 
