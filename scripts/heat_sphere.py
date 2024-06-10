@@ -17,10 +17,7 @@ import tyro
 
 from src.geometry.sphere import Sphere
 from src.solver.wos import wos
-from src.utils.taichi_types import (
-    VectorField,
-    Float1DArray,
-)
+
 
 # Initialize Taichi
 ti.init(arch=ti.gpu)
