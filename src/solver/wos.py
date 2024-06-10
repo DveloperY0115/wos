@@ -15,7 +15,7 @@ from ..utils.sampling import (
     uniform_ball,
     uniform_sphere,
 )
-from ..utils.types import (
+from ..utils.taichi_types import (
     Float1DArray,
     Scene,
     VectorField,
