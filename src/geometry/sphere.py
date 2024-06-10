@@ -5,9 +5,11 @@ sphere.py
 import taichi as ti
 import taichi.math as tm
 
+from .base_class import Geometry
+
 
 @ti.dataclass
-class Sphere:
+class Sphere(Geometry):
 
     center: tm.vec3
     """Center of the sphere"""
