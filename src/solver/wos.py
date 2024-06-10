@@ -41,15 +41,15 @@ def wos_walk(
         dist = scene.query_dist(curr_pt)
         dist_abs = ti.abs(dist)
 
-        # Terminate the walk when reached boundary
-        if dist_abs < eps:
-            break
-
         # Accumulate source term
         src_pt = uniform_ball(dist_abs, curr_pt)
         src_val = scene.query_source(src_pt)
         v_ball = volume_ball(dist_abs)
         sol += v_ball * src_val * harmonic_green_3d(curr_pt, src_pt, dist_abs)
+
+        # Terminate the walk when reached boundary
+        if dist_abs < eps:
+            break
 
         # Sample a random point on a sphere whose
         # radius is the distance to the closest boundary point
