@@ -24,7 +24,8 @@ def normalize_mesh(
     if method == "unit_cube":
         v_min = np.min(v, axis=0, keepdims=True)
         v_max = np.max(v, axis=0, keepdims=True)
-        v = (v - v_min) / ((v_max - v_min) + EPS)
+        scale = np.max(v_max - v_min)
+        v = (v - v_min) / (scale + EPS)
         v = v - 0.5
 
     elif method == "unit_sphere":
