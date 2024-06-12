@@ -2,6 +2,11 @@ import taichi as ti
 # import Primitive as Primitive
 from . import Primitive
 
+from ...utils.taichi_types import (
+    Float1DArray,
+    VectorField,
+)
+
 #            0                  | 1         | 2             | 3             | 4             |5          |6      |9      | 
 #            32bit              | 32bit     | 32bit         | 32bit         | 32bit         |32bit      |96bit  |96bit 
 #self.bvh_node  : is_leaf axis  |left_node    right_node      parent_node     leaf_index     leaf_count  min_v3  max_v3   12
@@ -214,6 +219,35 @@ class Bvh:
         gradient = gradient.normalized()
         return ti.Vector([t,closest.x,closest.y,closest.z,sign*gradient.x,sign*gradient.y,sign*gradient.z])
 
+    @ti.kernel
+    def signed_distance_field(
+        self,
+        pts: VectorField,
+        dists_: Float1DArray,
+    ):
+        for i in range(pts.shape[0]):
+            dists_[i], _ = self.signed_distance(pts[i])
+
+        # t, closest = self.signed_distance(pts)
+        # #t, normal = self.signed_distance_brute_force(point)
+        # sign = 1.0
+        # if (t > 0.0):
+        #     sign = -1.0
+        # gradient  = (closest - pts) * sign
+
+        '''
+        #complicated way to do this
+        eps = 0.01
+        for i in range(3):
+            offset = ti.Vector([0.0, 0.0, 0.0]) 
+            offset[i] = eps
+            tp,closestp = self.signed_distance(point + offset) 
+            tn,closestn = self.signed_distance(point - offset) 
+            gradient[i] = (tp - tn) / (eps * 2.0)
+        '''
+
+        # gradient = gradient.normalized()
+        # return ti.Vector([t,closest.x,closest.y,closest.z,sign*gradient.x,sign*gradient.y,sign*gradient.z])
 
     ############Interface##############
     @ti.func
@@ -362,7 +396,7 @@ class Bvh:
                 if (hit_t < Primitive.INF_VALUE):
                     sd = -sd
 
-        return sd+sd_extra,closest_p
+        return sd + sd_extra, closest_p
 
     @ti.func
     def coliison(self):
