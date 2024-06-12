@@ -28,9 +28,6 @@ class Mesh(Geometry):
         self.v = v
         self.f = f
 
-        # print(type(self.v), type(self.f))
-        # exit(0)
-
     @ti.func
     def query_dist(self, x: tm.vec3):
         """
