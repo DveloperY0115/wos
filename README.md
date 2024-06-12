@@ -42,6 +42,13 @@ The flag `--no-src-only` will solve the PDE with only boundary conditions, while
     </tr>
 </table>
 
+# TODOs
+- [ ] Fix bugs in the Bounding Volume Hierarchy (BVH) on GPUs (e.g., CUDA, Metal, etc)
+- [ ] Design a data structure for triangular meshes encapsulating:
+    - Geometry with acceleration structures (e.g., BVH)
+    - Boundary conditions
+    - (Optional) Textures and materials for visualization
+
 # Readings
 This project is greatly inspired by the following papers:
 - [Monte Carlo Geometry Processing: A Grid-Free Approach to PDE-Based Methods on Volumetric Domains, ACM ToG 2020](https://dl.acm.org/doi/abs/10.1145/3386569.3392374)
