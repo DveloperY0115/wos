@@ -22,11 +22,15 @@ def normalize_mesh(
     Normalizes the vertices of a mesh to a unit cube or a unit sphere.
     """
     if method == "unit_cube":
+        # Center the vertices
+        v_mean = np.mean(v, axis=0, keepdims=True)
+        v = v - v_mean
+
+        # Scale the vertices
         v_min = np.min(v, axis=0, keepdims=True)
         v_max = np.max(v, axis=0, keepdims=True)
         scale = np.max(v_max - v_min)
-        v = (v - v_min) / (scale + EPS)
-        v = v - 0.5
+        v = v / (scale + EPS)
 
     elif method == "unit_sphere":
         v_mean = np.mean(v, axis=0, keepdims=True)
