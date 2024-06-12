@@ -151,7 +151,7 @@ class LBvh(Bvh.Bvh):
     @ti.kernel
     def build_bvh(self):
         for i in self.bvh_node:
-            self.init_bvh_node( i)
+            self.init_bvh_node(i)
             self.bvh_done[0] = 0
 
         for i in self.bvh_node:
@@ -204,17 +204,16 @@ class LBvh(Bvh.Bvh):
     @ti.kernel
     def gen_aabb(self):
         for i in self.bvh_node:
-            if (self.get_node_has_box(i)   == 0):
-                left_node,right_node   = self.get_node_child(i) 
+            if (self.get_node_has_box(i) == 0):
+                left_node, right_node = self.get_node_child(i) 
                 
                 is_left_rdy  = self.get_node_has_box(left_node)
                 is_right_rdy = self.get_node_has_box(right_node)
 
                 if (is_left_rdy and is_right_rdy) > 0:
-                    
-                    l_min,l_max = self.get_node_min_max(left_node)  
-                    r_min,r_max = self.get_node_min_max(right_node)  
-                    self.set_node_min_max(i, min(l_min, r_min),max(l_max, r_max))
+                    l_min, l_max = self.get_node_min_max(left_node)  
+                    r_min, r_max = self.get_node_min_max(right_node)  
+                    self.set_node_min_max(i, ti.min(l_min, r_min), ti.max(l_max, r_max))
                     self.bvh_done[0] += 1
                     #print("ok", i, left_node, right_node)
     ## 

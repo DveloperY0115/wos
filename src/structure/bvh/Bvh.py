@@ -116,11 +116,11 @@ class Bvh:
 
     @ti.func
     def get_node_has_box(self,  index):
-        return (self.bvh_node[index][6]  <= self.bvh_node[index][9]) and (self.bvh_node[index][7]  <= self.bvh_node[index][10]) and (self.bvh_node[index][8]  <= self.bvh_node[index][11])
+        return (self.bvh_node[index][6] <= self.bvh_node[index][9]) and (self.bvh_node[index][7] <= self.bvh_node[index][10]) and (self.bvh_node[index][8] <= self.bvh_node[index][11])
 
     @ti.func
     def get_node_child(self, index):
-        return int(self.bvh_node[index][1]),int(self.bvh_node[index][2])
+        return int(self.bvh_node[index][1]), int(self.bvh_node[index][2])
     @ti.func
     def get_node_parent(self, index):
         return int(self.bvh_node[index][3])
