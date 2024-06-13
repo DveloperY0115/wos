@@ -32,17 +32,17 @@ In the first script, setting the flag `--no-src-only` will solve the PDE with on
     <tr>
         <td>
             <figure>
-                <img src="./media/sphere_heat_boundary.gif", width="378px">
+                <img src="./media/sphere_heat_boundary.gif", width="252px">
             </figure>
         </td>
         <td>
             <figure>
-                <img src="./media/sphere_heat_source.gif", width="378px">
+                <img src="./media/sphere_heat_source.gif", width="252px">
             </figure>
         </td>
         <td>
             <figure>
-                <img src="./media/mesh_heat_boundary.gif", width="378px">
+                <img src="./media/mesh_heat_boundary.gif", width="252px">
             </figure>
         </td>
     </tr>
