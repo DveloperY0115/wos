@@ -5,6 +5,7 @@ A simple toy experiment for solving heat equation inside a sphere.
 """
 
 from dataclasses import dataclass
+from pathlib import Path
 import time
 
 from jaxtyping import jaxtyped
@@ -12,6 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import taichi as ti
 import taichi.math as tm
+from tqdm import tqdm
 from typeguard import typechecked
 import tyro
 
@@ -24,6 +26,12 @@ ti.init(arch=ti.gpu)
 
 @dataclass
 class Args:
+
+    out_dir: Path
+    """Output directory"""
+    use_gui: bool = False
+    """Flag to enable GUI visualization"""
+
     radius: float = 1.0
     """Radius of the sphere"""
     src_only: bool = True
@@ -33,7 +41,7 @@ class Args:
     """The z-coordinate of the plane (i.e., slice) to visualize the heat map"""
     eps: float = 1e-6
     """Threshold to determine whether a walk has reached the domain boundary"""
-    n_walk: int = 100000
+    n_walk: int = 10000
     """Maximum number of random walks for each query point to simulate"""
     n_step: int = 50
     """Maximum number of steps for each random walk"""
@@ -70,13 +78,36 @@ def main(args: Args) -> None:
     query_pts_.from_numpy(query_pts.astype(np.float32))
     query_pts = query_pts_
     
-    # Initialize GUI
-    print("Launching walk...")
-    gui = ti.GUI("Heat Sphere", (args.img_width, args.img_height))
+    # Create output directory
+    args.out_dir.mkdir(parents=True, exist_ok=True)
+    print(f"Output directory: {args.out_dir}")
 
-    while gui.running:
+    print("Launching walk...")
+    if args.use_gui:
+        gui = ti.GUI("Heat Sphere", (args.img_width, args.img_height))
+
+        while gui.running:
+            sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
+            for walk_idx in range(args.n_walk):
+                wos(query_pts, sphere, args.eps, args.n_step, sol)
+                sol = sol.to_numpy()
+                sol = sol.reshape(args.img_height, args.img_width)
+
+                # Visualize the solution
+                sol_vis = sol.copy() / (walk_idx + 1)
+                sol_vis = plt.cm.coolwarm(plt.Normalize()(sol_vis))
+                gui.set_image(sol_vis)
+                gui.show()
+
+                sol = sol.reshape(args.img_height * args.img_width)
+                sol_ = ti.ndarray(dtype=ti.f32, shape=(sol.shape[0]))
+                sol_.from_numpy(sol)
+                sol = sol_
+
+                time.sleep(max(args.vis_every, 0.0))
+    else:
         sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
-        for walk_idx in range(args.n_walk):
+        for walk_idx in tqdm(range(args.n_walk)):
             wos(query_pts, sphere, args.eps, args.n_step, sol)
             sol = sol.to_numpy()
             sol = sol.reshape(args.img_height, args.img_width)
@@ -84,15 +115,12 @@ def main(args: Args) -> None:
             # Visualize the solution
             sol_vis = sol.copy() / (walk_idx + 1)
             sol_vis = plt.cm.coolwarm(plt.Normalize()(sol_vis))
-            gui.set_image(sol_vis)
-            gui.show()
+            ti.tools.imwrite(sol_vis, str(args.out_dir / f"sol_{walk_idx:04d}.png"))
 
             sol = sol.reshape(args.img_height * args.img_width)
             sol_ = ti.ndarray(dtype=ti.f32, shape=(sol.shape[0]))
             sol_.from_numpy(sol)
             sol = sol_
-
-            time.sleep(max(args.vis_every, 0.0))
 
 
 if __name__ == "__main__":
