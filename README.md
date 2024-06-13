@@ -25,7 +25,7 @@ export PYTHONPATH=.
 Check the installation by running simple examples that solve the Laplace equation over a 2-sphere or a triangular mesh with a Dirichlet boundary condition:
 ```
 python scripts/heat_sphere.py --out-dir {OUTPUT DIRECTORY} --{no-src-only|src-only}
-python scripts/heat_sphere.py --mesh-path data/spot_unit_cube.obj --out-dir {OUTPUT DIRECTORY}
+python scripts/heat_mesh.py --mesh-path data/spot_unit_cube.obj --out-dir {OUTPUT DIRECTORY}
 ```
 In the first script, setting the flag `--no-src-only` will solve the PDE with only boundary conditions, while `--src-only` will solve the PDE with only source terms.  
 
