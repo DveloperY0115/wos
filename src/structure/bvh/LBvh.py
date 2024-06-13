@@ -1,3 +1,7 @@
+"""
+Code borrowed from https://github.com/lyd405121/ti-bvh
+"""
+
 import time as time
 
 import taichi as ti

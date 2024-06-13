@@ -1,3 +1,6 @@
+"""
+Code borrowed from https://github.com/lyd405121/ti-bvh
+"""
 
 import numpy as np
 import taichi as ti

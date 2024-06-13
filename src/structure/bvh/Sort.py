@@ -1,3 +1,7 @@
+"""
+Code borrowed from https://github.com/lyd405121/ti-bvh
+"""
+
 import taichi as ti
 
 from . import Primitive
