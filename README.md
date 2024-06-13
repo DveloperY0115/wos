@@ -27,7 +27,9 @@ Check the installation by running simple examples that solve the Laplace equatio
 python scripts/heat_sphere.py --out-dir {OUTPUT DIRECTORY} --{no-src-only|src-only}
 python scripts/heat_sphere.py --mesh-path data/spot_unit_cube.obj --out-dir {OUTPUT DIRECTORY}
 ```
-In the first script, setting the flag `--no-src-only` will solve the PDE with only boundary conditions, while `--src-only` will solve the PDE with only source terms. When executed, the codes should display the following visualizations: the first panel shows the solution with a boundary condition defined over a 2-sphere, while the second panel shows the solution with only source terms defined inside the 2-sphere. The third panel shows the solution with a boundary condition defined over a triangular mesh.
+In the first script, setting the flag `--no-src-only` will solve the PDE with only boundary conditions, while `--src-only` will solve the PDE with only source terms.  
+
+When executed, the codes should display the following visualizations: the first panel shows the solution with a boundary condition defined over a 2-sphere, while the second panel shows the solution with only source terms defined inside the 2-sphere. The third panel shows the solution with a boundary condition defined over a triangular mesh.
 <table>
     <tr>
         <td>
