@@ -22,21 +22,27 @@ conda activate wos
 export PYTHONPATH=.
 ```
 
-Check the installation by running a simple example that solves the Laplace equation over a 2-sphere with a Dirichlet boundary condition:
+Check the installation by running simple examples that solve the Laplace equation over a 2-sphere or a triangular mesh with a Dirichlet boundary condition:
 ```
 python scripts/heat_sphere.py --{no-src-only|src-only}
+<!-- python scripts/heat_sphere.py --{no-src-only|src-only} -->
 ```
 The flag `--no-src-only` will solve the PDE with only boundary conditions, while `--src-only` will solve the PDE with only source terms. When executed, the code should display the following visualization: the left panel shows the solution with only boundary conditions, while the right panel shows the solution with only source terms.
 <table>
     <tr>
         <td>
             <figure>
-                <img src="./media/example_heat_bd-only.png", width="378px">
+                <img src="./media/sphere_heat_boundary.gif", width="378px">
             </figure>
         </td>
         <td>
             <figure>
-                <img src="./media/example_heat_src-only.png", width="378px">
+                <img src="./media/sphere_heat_source.gif", width="378px">
+            </figure>
+        </td>
+        <td>
+            <figure>
+                <img src="./media/mesh_heat_boundary.gif", width="378px">
             </figure>
         </td>
     </tr>
