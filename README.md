@@ -24,10 +24,10 @@ export PYTHONPATH=.
 
 Check the installation by running simple examples that solve the Laplace equation over a 2-sphere or a triangular mesh with a Dirichlet boundary condition:
 ```
-python scripts/heat_sphere.py --{no-src-only|src-only}
-<!-- python scripts/heat_sphere.py --{no-src-only|src-only} -->
+python scripts/heat_sphere.py --out-dir {OUTPUT DIRECTORY} --{no-src-only|src-only}
+python scripts/heat_sphere.py --mesh-path data/spot_unit_cube.obj --out-dir {OUTPUT DIRECTORY}
 ```
-The flag `--no-src-only` will solve the PDE with only boundary conditions, while `--src-only` will solve the PDE with only source terms. When executed, the code should display the following visualization: the left panel shows the solution with only boundary conditions, while the right panel shows the solution with only source terms.
+In the first script, setting the flag `--no-src-only` will solve the PDE with only boundary conditions, while `--src-only` will solve the PDE with only source terms. When executed, the codes should display the following visualizations: the first panel shows the solution with a boundary condition defined over a 2-sphere, while the second panel shows the solution with only source terms defined inside the 2-sphere. The third panel shows the solution with a boundary condition defined over a triangular mesh.
 <table>
     <tr>
         <td>
@@ -49,7 +49,7 @@ The flag `--no-src-only` will solve the PDE with only boundary conditions, while
 </table>
 
 # TODOs
-- [ ] Fix bugs in the Bounding Volume Hierarchy (BVH) on GPUs (e.g., CUDA, Metal, etc)
+- [ ] Fix bugs in the Bounding Volume Hierarchy (BVH) on GPUs when certain meshes are used (e.g., CUDA, Metal, etc)
 - [ ] Design a data structure for triangular meshes encapsulating:
     - Geometry with acceleration structures (e.g., BVH)
     - Boundary conditions
