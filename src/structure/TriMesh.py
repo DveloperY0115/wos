@@ -16,7 +16,6 @@ class TriMesh:
         self.line_bvh      =  ti.Vector.field(3, float)
         self.indice_bvh   =  ti.field(dtype=ti.i32)
 
-
     @ti.pyfunc
     def add_obj(self, filename):
         scene = pywavefront.Wavefront(filename)

@@ -29,7 +29,7 @@ class Args:
     mesh_path: Path
     """Path to the mesh file"""
 
-    z: float = 0.0
+    z: float = -0.1
     """The z-coordinate of the plane (i.e., slice) to visualize the heat map"""
     eps: float = 1e-6
     """Threshold to determine whether a walk has reached the domain boundary"""
@@ -40,9 +40,9 @@ class Args:
     vis_every: float = 0.0
     """Time interval between subsequent visualizations"""
 
-    img_height: int = 512
+    img_height: int = 64
     """Height of the image"""
-    img_width: int = 512
+    img_width: int = 64
     """Width of the image"""
 
 
@@ -50,23 +50,16 @@ class Args:
 def main(args: Args) -> None:
 
     # Initialize problem domain
-    v, f = igl.read_triangle_mesh(str(args.mesh_path))
-    v_ = ti.ndarray(dtype=ti.f32, shape=(v.shape[0], v.shape[1]))
-    v_.from_numpy(v.astype(np.float32))
-    v = v_
-    f_ = ti.ndarray(dtype=ti.i32, shape=(f.shape[0], f.shape[1]))
-    f_.from_numpy(f.astype(np.int32))
-    f = f_
-    mesh = Mesh(v, f)
+    mesh = Mesh(args.mesh_path)
 
     # Initialize query points
-    xs = np.linspace(-2.0, 2.0, args.img_width)
-    ys = np.linspace(-2.0, 2.0, args.img_height)
+    xs = np.linspace(-0.75, 0.75, args.img_width)
+    ys = np.linspace(-0.75, 0.75, args.img_height)
     xx, yy = np.meshgrid(xs, ys, indexing="xy")
 
     # Flatten the query points
     query_pts = np.stack(
-        [xx.flatten(), yy.flatten(), np.full_like(xx.flatten(), args.z)],
+        [np.full_like(xx.flatten(), args.z), xx.flatten(), yy.flatten()],
         axis=1,
     )
     query_pts_ = ti.Vector.field(3, dtype=ti.f32, shape=query_pts.shape[0])
@@ -75,7 +68,7 @@ def main(args: Args) -> None:
     
     # Initialize GUI
     print("Launching walk...")
-    gui = ti.GUI("Heat Sphere", (args.img_width, args.img_height))
+    gui = ti.GUI("Heat Mesh", (args.img_width, args.img_height))
 
     while gui.running:
         sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
