@@ -39,7 +39,7 @@ class Args:
     """Threshold to determine whether a walk has reached the domain boundary"""
     n_walk: int = 100000
     """Maximum number of random walks for each query point to simulate"""
-    n_step: int = 50
+    n_step: int = 25
     """Maximum number of steps for each random walk"""
     vis_every: float = 0.0
     """Time interval between subsequent visualizations"""
