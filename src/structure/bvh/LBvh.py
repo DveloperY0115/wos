@@ -6,9 +6,6 @@ import time as time
 
 import taichi as ti
 
-# import Primitive as Primitive
-# import Sort as Sort
-# import Bvh as Bvh
 from . import Primitive
 from . import Sort
 from . import Bvh

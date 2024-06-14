@@ -3,9 +3,8 @@ Code borrowed from https://github.com/lyd405121/ti-bvh
 """
 
 import taichi as ti
-# import Primitive as Primitive
-from . import Primitive
 
+from . import Primitive
 from ...utils.taichi_types import (
     Float1DArray,
     VectorField,
