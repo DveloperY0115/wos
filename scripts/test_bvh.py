@@ -1,5 +1,7 @@
 
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Literal
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,22 +9,43 @@ import taichi as ti
 import tyro
 
 from src.structure import TriMesh
+from src.structure import TriMesh_gpu
 
 
 @dataclass
 class Args:
 
+    device_type: Literal["cpu", "gpu"] = "cpu"
+    """Device to use """
+
+    out_dir: Path = Path("outputs/test_bvh")
+    """Output directory"""
+
     img_height: int = 512
+    """Height of the image"""
     img_width: int = 512
+    """Width of the image"""
     z: float = 0.0
+    """The z-coordinate of the plane (i.e., slice) to visualize the heat map"""
 
 
 def main(args: Args):
     
-    ti.init(arch=ti.cpu)
+    if args.device_type == "cpu":
+        ti.init(arch=ti.cpu)
+    elif args.device_type == "gpu":
+        ti.init(arch=ti.gpu)
+    else:
+        raise ValueError(f"Invalid device type: {args.device_type}")
 
     # Load mesh and build BVH
-    tri_mesh = TriMesh.TriMesh()
+    if args.device_type == "cpu":
+        tri_mesh = TriMesh.TriMesh()
+    elif args.device_type == "gpu":
+        tri_mesh = TriMesh.TriMesh()
+    else:
+        raise ValueError(f"Invalid device type: {args.device_type}")
+
     # tri_mesh.add_obj("model/Test.obj")
     tri_mesh.add_obj("./data/spot_unit_cube.obj")
     #tri_mesh.add_obj("model/Simple.obj")
@@ -33,6 +56,11 @@ def main(args: Args):
     tri_mesh.build_bvh()
     tri_mesh.setup_vert()
     # tri_mesh.write_bvh()
+
+    # Save data after tree construction
+    out_dir = args.out_dir / args.device_type
+    out_dir.mkdir(parents=True, exist_ok=True)
+    print(f"Output directory: {str(out_dir)}")
 
     # Initialize query points
     xs = np.linspace(-0.75, 0.75, args.img_width)
