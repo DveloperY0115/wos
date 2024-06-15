@@ -66,22 +66,26 @@ def harmonic_green_3d(x: tm.vec3, y: tm.vec3, R: float):
 @ti.func
 def yukawa_potential_2d(x: tm.vec2, y: tm.vec2, R: float, c: float):
     """
-    Computes the Yukawa potential defined in 2D space.
+    Computes the Yukawa potential defined in 2D space and the normalizer.
     """
     raise NotImplementedError("TODO")
 
 @ti.func
 def yukawa_potential_3d(x: tm.vec3, y: tm.vec3, R: float, c: float):
     """
-    Computes the Yukawa potential defined in 3D space.
+    Computes the Yukawa potential defined in 3D space and the normalizer.
     """
     assert R > 0.0, f"The parameter 'R' must be positive. Got {R}."
     assert c > 0.0, f"The parameter 'c' must be positive. Got {c}."
 
+    # Compute potential
     R_ = R + EPS
     r = tm.length(x - y) + EPS
     val = (1 / (4 * np.pi)) * ((sinh((R_ - r) * tm.sqrt(c))) / (r * sinh(R_ * tm.sqrt(c))))
-
     if tm.isnan(val) or tm.isinf(val):  # TODO: Why NaNs..?
         val = 0.0
-    return val
+
+    # Compute normalizer
+    normalizer = (R_ * tm.sqrt(c)) / (sinh(R_ * tm.sqrt(c)) + EPS)
+
+    return val, normalizer
