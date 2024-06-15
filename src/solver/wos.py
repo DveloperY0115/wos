@@ -11,6 +11,7 @@ from ..utils.constants import EquationType
 from ..utils.math_funcs import (
     harmonic_green_3d,
     volume_ball,
+    yukawa_potential_3d,
 )
 from ..utils.sampling import (
     uniform_ball,
@@ -37,6 +38,7 @@ def wos_walk(
     curr_pt = query_pt
 
     sol = 0.0
+    norm = 1.0  # Normalization constant used in Screened Poisson's equation
     for _ in range(n_step):
 
         # Compute the distance to the closest boundary point
@@ -54,7 +56,14 @@ def wos_walk(
             sol += v_ball * src_val * harmonic_green_3d(curr_pt, src_pt, dist_abs)
 
         elif eqn_type == EquationType.SCREENED_POISSON:
-            pass
+            src_pt = uniform_ball(dist_abs, curr_pt)
+            src_val = scene.query_source(src_pt)
+            v_ball = volume_ball(dist_abs)
+
+            c = 0.1  # TODO: Query this value from the scene
+            yukawa, norm_curr = yukawa_potential_3d(curr_pt, src_pt, dist_abs, c)
+            sol += norm * v_ball * src_val * yukawa
+            norm = norm * norm_curr  # Accumulate normalizer
 
         else:
             pass  # FIXME: Need to raise error, but Taichi does not support it
@@ -69,7 +78,11 @@ def wos_walk(
 
     # Retrieve the boundary value
     bd_val = scene.query_boundary(curr_pt)
-    sol += bd_val
+
+    if eqn_type == EquationType.SCREENED_POISSON:
+        sol += norm * bd_val
+    else:
+        sol += bd_val
 
     return sol
 
