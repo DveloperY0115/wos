@@ -51,6 +51,7 @@ When executed, the codes should display the following visualizations: the first 
 </table>
 
 # TODOs
+- [ ] Fix numerically unstable math functions (e.g., NaNs in Harmonic Green Functions and Yukawa Potentials, etc)
 - [ ] Fix bugs in the Bounding Volume Hierarchy (BVH) on GPUs when certain meshes are used (e.g., CUDA, Metal, etc)
 - [ ] Design a data structure for triangular meshes encapsulating:
     - Geometry with acceleration structures (e.g., BVH)
