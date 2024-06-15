@@ -19,6 +19,7 @@ import tyro
 
 from src.geometry.mesh import Mesh
 from src.solver.wos import wos
+from src.utils.constants import EquationType
 
 
 # Initialize Taichi
@@ -32,6 +33,8 @@ class Args:
     """Output directory"""
     use_gui: bool = False
     """Flag to enable GUI visualization"""
+    eqn_type: EquationType = EquationType.POISSON
+    """Type of equation to solve"""
 
     z: float = -0.1
     """The z-coordinate of the plane (i.e., slice) to visualize the heat map"""
@@ -82,7 +85,14 @@ def main(args: Args) -> None:
         while gui.running:
             sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
             for walk_idx in range(args.n_walk):
-                wos(query_pts, mesh, args.eps, args.n_step, sol)
+                wos(
+                    query_pts,
+                    mesh,
+                    args.eps,
+                    args.n_step,
+                    args.eqn_type,
+                    sol,
+                )
                 sol = sol.to_numpy()
                 sol = sol.reshape(args.img_height, args.img_width)
 

@@ -19,6 +19,7 @@ import tyro
 
 from src.geometry.sphere import Sphere
 from src.solver.wos import wos
+from src.utils.constants import EquationType
 
 
 # Initialize Taichi
@@ -34,8 +35,8 @@ class Args:
 
     radius: float = 1.0
     """Radius of the sphere"""
-    src_only: bool = True
-    """Flag to enable only the source term"""
+    eqn_type: EquationType = EquationType.POISSON
+    """Type of equation to solve"""
 
     z: float = 0.0
     """The z-coordinate of the plane (i.e., slice) to visualize the heat map"""
@@ -61,7 +62,6 @@ def main(args: Args) -> None:
     sphere = Sphere(
         center=tm.vec3([0.0, 0.0, 0.0]),
         radius=args.radius,
-        src_only=args.src_only,
     )
 
     # Initialize query points
@@ -89,7 +89,14 @@ def main(args: Args) -> None:
         while gui.running:
             sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
             for walk_idx in range(args.n_walk):
-                wos(query_pts, sphere, args.eps, args.n_step, sol)
+                wos(
+                    query_pts,
+                    sphere,
+                    args.eps,
+                    args.n_step,
+                    args.eqn_type,
+                    sol,
+                )
                 sol = sol.to_numpy()
                 sol = sol.reshape(args.img_height, args.img_width)
 

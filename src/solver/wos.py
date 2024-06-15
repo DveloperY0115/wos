@@ -7,6 +7,7 @@ A Taichi implementation of the Walk-on-Spheres algorithm.
 import taichi as ti
 import taichi.math as tm
 
+from ..utils.constants import EquationType
 from ..utils.math_funcs import (
     harmonic_green_3d,
     volume_ball,
@@ -28,6 +29,7 @@ def wos_walk(
     scene: Scene,
     n_step: int,
     eps: float,
+    eqn_type: ti.template(),  # FIXME: Need to add a proper type hint
 ):
     """
     Takes a single step of the Walk-on-Spheres algorithm.
@@ -41,11 +43,21 @@ def wos_walk(
         dist = scene.query_dist(curr_pt)
         dist_abs = ti.abs(dist)
 
-        # Accumulate source term
-        src_pt = uniform_ball(dist_abs, curr_pt)
-        src_val = scene.query_source(src_pt)
-        v_ball = volume_ball(dist_abs)
-        sol += v_ball * src_val * harmonic_green_3d(curr_pt, src_pt, dist_abs)
+        # Accumulate source term if necessary
+        if eqn_type == EquationType.LAPLACE:
+            pass  # Do nothing
+
+        elif eqn_type == EquationType.POISSON:
+            src_pt = uniform_ball(dist_abs, curr_pt)
+            src_val = scene.query_source(src_pt)
+            v_ball = volume_ball(dist_abs)
+            sol += v_ball * src_val * harmonic_green_3d(curr_pt, src_pt, dist_abs)
+
+        elif eqn_type == EquationType.SCREENED_POISSON:
+            pass
+
+        else:
+            pass  # FIXME: Need to raise error, but Taichi does not support it
 
         # Terminate the walk when reached boundary
         if dist_abs < eps:
@@ -68,6 +80,7 @@ def wos(
     scene: Scene,
     eps: float,
     n_step: int,
+    eqn_type: ti.template(),  # FIXME: Need to add a proper type hint
     sol_: Float1DArray,
 ):
     """
@@ -78,5 +91,5 @@ def wos(
     """
     for i in range(query_pts.shape[0]):  # Parallelized
         sol_[i] += wos_walk(
-            query_pts[i], scene, n_step, eps
+            query_pts[i], scene, n_step, eps, eqn_type
         )
