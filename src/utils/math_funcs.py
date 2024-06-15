@@ -8,6 +8,19 @@ import taichi.math as tm
 
 from .constants import EPS
 
+@ti.func
+def sinh(x: float):
+    """
+    Computes the hyperbolic sine of the input value.
+    """
+    return 0.5 * (tm.exp(x) - tm.exp(-x))
+
+@ti.func
+def cosh(x: float):
+    """
+    Computes the hyperbolic cosine of the input value.
+    """
+    return 0.5 * (tm.exp(x) + tm.exp(-x))
 
 @ti.func
 def volume_ball(radius: float):
@@ -46,6 +59,29 @@ def harmonic_green_3d(x: tm.vec3, y: tm.vec3, R: float):
     """
     R_ = R + EPS
     val = (1 / (4 * np.pi)) * ((R_ - tm.length(x - y)) / ((tm.length(x - y) * R_) + EPS))
+    if tm.isnan(val) or tm.isinf(val):  # TODO: Why NaNs..?
+        val = 0.0
+    return val
+
+@ti.func
+def yukawa_potential_2d(x: tm.vec2, y: tm.vec2, R: float, c: float):
+    """
+    Computes the Yukawa potential defined in 2D space.
+    """
+    raise NotImplementedError("TODO")
+
+@ti.func
+def yukawa_potential_3d(x: tm.vec3, y: tm.vec3, R: float, c: float):
+    """
+    Computes the Yukawa potential defined in 3D space.
+    """
+    assert R > 0.0, f"The parameter 'R' must be positive. Got {R}."
+    assert c > 0.0, f"The parameter 'c' must be positive. Got {c}."
+
+    R_ = R + EPS
+    r = tm.length(x - y) + EPS
+    val = (1 / (4 * np.pi)) * ((sinh((R_ - r) * tm.sqrt(c))) / (r * sinh(R_ * tm.sqrt(c))))
+
     if tm.isnan(val) or tm.isinf(val):  # TODO: Why NaNs..?
         val = 0.0
     return val
