@@ -22,29 +22,22 @@ conda activate wos
 export PYTHONPATH=.
 ```
 
-Check the installation by running simple examples that solve the Laplace equation over a 2-sphere or a triangular mesh with a Dirichlet boundary condition:
+Check the installation by running simple examples that solve the Poisson's equation over a 2-sphere or a triangular mesh with a Dirichlet boundary condition:
 ```
-python scripts/heat_sphere.py --out-dir {OUTPUT DIRECTORY} --{no-src-only|src-only}
-python scripts/heat_mesh.py --mesh-path data/spot_unit_cube.obj --out-dir {OUTPUT DIRECTORY}
+python scripts/heat_sphere.py --out-dir {OUTPUT DIRECTORY} --use-gui
+python scripts/heat_mesh.py --mesh-path data/spot_unit_cube.obj --out-dir {OUTPUT DIRECTORY} --use-gui
 ```
-In the first script, setting the flag `--no-src-only` will solve the PDE with only boundary conditions, while `--src-only` will solve the PDE with only source terms.  
-
-When executed, the codes should display the following visualizations: the first panel shows the solution with a boundary condition defined over a 2-sphere, while the second panel shows the solution with only source terms defined inside the 2-sphere. The third panel shows the solution with a boundary condition defined over a triangular mesh.
+When executed, the scripts should display the following visualizations: the first panel shows the solution defined over a 2-sphere, while the second panel shows the solution with a boundary condition defined over a triangular mesh. You may disable the GUI by removing the `--use-gui` flag and save the results to the specified output directory.
 <table>
     <tr>
         <td>
             <figure>
-                <img src="./media/sphere_heat_boundary.gif", width="252px">
+                <img src="./media/sphere_heat_boundary.gif", width="378px">
             </figure>
         </td>
         <td>
             <figure>
-                <img src="./media/sphere_heat_source.gif", width="252px">
-            </figure>
-        </td>
-        <td>
-            <figure>
-                <img src="./media/mesh_heat_boundary.gif", width="252px">
+                <img src="./media/mesh_heat_boundary.gif", width="378px">
             </figure>
         </td>
     </tr>
