@@ -62,3 +62,10 @@ class Mesh(Geometry):
         """
         src_val = 0.0
         return src_val
+
+    @ti.func
+    def query_screen_constant(self, x: tm.vec3):
+        """
+        Query the screening constant defined over the sphere.
+        """
+        return 1e-1

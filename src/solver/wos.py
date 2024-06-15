@@ -60,7 +60,7 @@ def wos_walk(
             src_val = scene.query_source(src_pt)
             v_ball = volume_ball(dist_abs)
 
-            c = 0.1  # TODO: Query this value from the scene
+            c = scene.query_screen_constant(curr_pt)
             yukawa, norm_curr = yukawa_potential_3d(curr_pt, src_pt, dist_abs, c)
             sol += norm * v_ball * src_val * yukawa
             norm = norm * norm_curr  # Accumulate normalizer

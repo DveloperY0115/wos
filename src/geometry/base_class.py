@@ -13,12 +13,16 @@ class Geometry:
 
     @ti.func
     def query_dist(self, x: tm.vec3):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     @ti.func
     def query_boundary(self, x: tm.vec3):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     @ti.func
     def query_source(self, x: tm.vec3):
-        raise NotImplementedError
+        raise NotImplementedError()
+
+    @ti.func
+    def query_screen_constant(self, x: tm.vec3):
+        raise NotImplementedError()
