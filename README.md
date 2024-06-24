@@ -44,6 +44,7 @@ When executed, the scripts should display the following visualizations: the firs
 </table>
 
 # TODOs
+- [ ] Implement the solver for spatially varying coefficient introduced in [Sawhney et al., 2022, ACM ToG 2022](https://dl.acm.org/doi/abs/10.1145/3528223.3530134)
 - [ ] Fix numerically unstable math functions (e.g., NaNs in Harmonic Green Functions and Yukawa Potentials, etc)
 - [ ] Fix bugs in the Bounding Volume Hierarchy (BVH) on GPUs when certain meshes are used (e.g., CUDA, Metal, etc)
 - [ ] Design a data structure for triangular meshes encapsulating:
