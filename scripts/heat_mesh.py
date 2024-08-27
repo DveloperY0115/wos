@@ -111,7 +111,14 @@ def main(args: Args) -> None:
     else:
         sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
         for walk_idx in tqdm(range(args.n_walk)):
-            wos(query_pts, mesh, args.eps, args.n_step, sol)
+            wos(
+                query_pts,
+                mesh,
+                args.eps,
+                args.n_step,
+                args.eqn_type,
+                sol,
+            )
             sol = sol.to_numpy()
             sol = sol.reshape(args.img_height, args.img_width)
 
