@@ -17,7 +17,7 @@ from tqdm import tqdm
 from typeguard import typechecked
 import tyro
 
-from src.geometry.sphere import Sphere
+from src.geometry.mesh import Mesh
 from src.solver.wos import wos
 from src.utils.constants import EquationType
 
@@ -27,18 +27,16 @@ ti.init(arch=ti.gpu)
 
 @dataclass
 class Args:
-
+    mesh_path: Path
+    """Path to the mesh file"""
     out_dir: Path
     """Output directory"""
     use_gui: bool = False
     """Flag to enable GUI visualization"""
-
-    radius: float = 1.0
-    """Radius of the sphere"""
-    eqn_type: EquationType = EquationType.POISSON
+    eqn_type: EquationType = EquationType.poisson
     """Type of equation to solve"""
 
-    z: float = 0.0
+    z: float = -0.1
     """The z-coordinate of the plane (i.e., slice) to visualize the heat map"""
     eps: float = 1e-6
     """Threshold to determine whether a walk has reached the domain boundary"""
@@ -46,7 +44,7 @@ class Args:
     """Maximum number of random walks for each query point to simulate"""
     n_step: int = 25
     """Maximum number of steps for each random walk"""
-    vis_every: float = 0.0
+    vis_every: int = 100
     """Time interval between subsequent visualizations"""
 
     img_height: int = 512
@@ -59,19 +57,16 @@ class Args:
 def main(args: Args) -> None:
 
     # Initialize problem domain
-    sphere = Sphere(
-        center=tm.vec3([0.0, 0.0, 0.0]),
-        radius=args.radius,
-    )
+    mesh = Mesh(args.mesh_path)
 
     # Initialize query points
-    xs = np.linspace(-2.0, 2.0, args.img_width)
-    ys = np.linspace(-2.0, 2.0, args.img_height)
+    xs = np.linspace(-0.75, 0.75, args.img_width)
+    ys = np.linspace(-0.75, 0.75, args.img_height)
     xx, yy = np.meshgrid(xs, ys, indexing="xy")
 
     # Flatten the query points
     query_pts = np.stack(
-        [xx.flatten(), yy.flatten(), np.full_like(xx.flatten(), args.z)],
+        [np.full_like(xx.flatten(), args.z), xx.flatten(), yy.flatten()],
         axis=1,
     )
     query_pts_ = ti.Vector.field(3, dtype=ti.f32, shape=query_pts.shape[0])
@@ -82,59 +77,75 @@ def main(args: Args) -> None:
     args.out_dir.mkdir(parents=True, exist_ok=True)
     print(f"Output directory: {args.out_dir}")
 
+    # Initialize GUI
     print("Launching walk...")
+    total_sol = np.zeros((args.img_height, args.img_width))
     if args.use_gui:
-        gui = ti.GUI("Heat Sphere", (args.img_width, args.img_height))
+        gui = ti.GUI("Heat Mesh", (args.img_width, args.img_height))
 
         while gui.running:
-            sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
             for walk_idx in range(args.n_walk):
+
+                # Allocate memory for the solution obtained from this walk
+                curr_sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
+
+                # Random walk
                 wos(
                     query_pts,
-                    sphere,
+                    mesh,
                     args.eps,
                     args.n_step,
                     args.eqn_type,
-                    sol,
+                    curr_sol,
                 )
-                sol = sol.to_numpy()
-                sol = sol.reshape(args.img_height, args.img_width)
+                curr_sol = curr_sol.to_numpy()
+                curr_sol = curr_sol.reshape(args.img_height, args.img_width)
+
+                # Compute cumulative average
+                total_sol = (curr_sol + (walk_idx + 1) * total_sol) / (walk_idx + 2)
+                assert not np.any(np.isnan(total_sol)), "NaN detected in the solution"
+                assert not np.any(np.isinf(total_sol)), "Inf detected in the solution"
 
                 # Visualize the solution
-                sol_vis = sol.copy() / (walk_idx + 1)
-                sol_vis = plt.cm.coolwarm(plt.Normalize()(sol_vis))
+                sol_vis = plt.cm.coolwarm(plt.Normalize()(total_sol))
                 gui.set_image(sol_vis)
                 gui.show()
 
-                sol = sol.reshape(args.img_height * args.img_width)
-                sol_ = ti.ndarray(dtype=ti.f32, shape=(sol.shape[0]))
-                sol_.from_numpy(sol)
-                sol = sol_
-
-                time.sleep(max(args.vis_every, 0.0))
+                # time.sleep(max(args.vis_every, 0.0))
     else:
-        sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
         for walk_idx in tqdm(range(args.n_walk)):
+
+            # Allocate memory for the solution obtained from this walk
+            curr_sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
+
+            # Random walk
             wos(
                 query_pts,
-                sphere,
+                mesh,
                 args.eps,
                 args.n_step,
                 args.eqn_type,
-                sol,
+                curr_sol,
             )
-            sol = sol.to_numpy()
-            sol = sol.reshape(args.img_height, args.img_width)
+            curr_sol = curr_sol.to_numpy()
+            curr_sol = curr_sol.reshape(args.img_height, args.img_width)
+
+            # Compute the cumulative average
+            total_sol = (curr_sol + (walk_idx + 1) * total_sol) / (walk_idx + 2)
+            assert not np.any(np.isnan(total_sol)), "NaN detected in the solution"
+            assert not np.any(np.isinf(total_sol)), "Inf detected in the solution"
+
+            ####
+            print(walk_idx, f"{np.min(total_sol):.3f}", f"{np.max(total_sol):.3f}")
+            ####
 
             # Visualize the solution
-            sol_vis = sol.copy() / (walk_idx + 1)
-            sol_vis = plt.cm.coolwarm(plt.Normalize()(sol_vis))
-            ti.tools.imwrite(sol_vis, str(args.out_dir / f"sol_{walk_idx:04d}.png"))
+            if (walk_idx + 1) % args.vis_every == 0:
+                sol_vis = plt.cm.coolwarm(plt.Normalize()(total_sol))
+                ti.tools.imwrite(sol_vis, str(args.out_dir / f"sol_{walk_idx+1:04d}.png"))
 
-            sol = sol.reshape(args.img_height * args.img_width)
-            sol_ = ti.ndarray(dtype=ti.f32, shape=(sol.shape[0]))
-            sol_.from_numpy(sol)
-            sol = sol_
+    # Save the solution
+    np.save(args.out_dir / f"sol_n-walk-{args.n_walk}.npy", total_sol)
 
 
 if __name__ == "__main__":
