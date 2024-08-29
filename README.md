@@ -25,14 +25,21 @@ export PYTHONPATH=.
 Check the installation by running simple examples that solve the Poisson's equation over a 2-sphere or a triangular mesh with a Dirichlet boundary condition:
 ```
 python scripts/wos_solver/heat_sphere.py --out-dir {OUTPUT DIRECTORY} --use-gui
+python scripts/wos_solver/heat_sphere.py --out-dir {OUTPUT DIRECTORY} --use-gui --eqn-type poisson
 python scripts/wos_solver/heat_mesh.py --mesh-path data/spot_unit_cube.obj --out-dir {OUTPUT DIRECTORY} --use-gui
 ```
-When executed, the scripts should display the following visualizations: the first panel shows the solution defined over a 2-sphere, while the second panel shows the solution with a boundary condition defined over a triangular mesh. You may disable the GUI by removing the `--use-gui` flag and save the results to the specified output directory.
+When executed, the scripts should display the following visualizations: the first panel shows the solution defined over a 2-sphere, while the second panel shows the impact of a heat source near the center of the sphere.
+The last panel shows the solution with a boundary condition defined over a triangular mesh. You may disable the GUI by removing the `--use-gui` flag and save the results to the specified output directory.
 <table>
     <tr>
         <td>
             <figure>
                 <img src="./media/sphere_heat_boundary.gif", width="378px">
+            </figure>
+        </td>
+        <td>
+            <figure>
+                <img src="./media/sphere_heat_source.gif", width="378px">
             </figure>
         </td>
         <td>
