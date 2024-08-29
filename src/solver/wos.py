@@ -103,6 +103,7 @@ def wos(
     - n_step: The number of maximum steps for each random walk
     """
     for i in range(query_pts.shape[0]):  # Parallelized
-        sol_[i] += wos_walk(
+        curr_sol = wos_walk(
             query_pts[i], scene, n_step, eps, eqn_type
         )
+        sol_[i] = curr_sol
