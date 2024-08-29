@@ -6,7 +6,7 @@ A collection of constants used in the project.
 
 from enum import Enum
 
-EPS = 1e-8
+EPS = 1e-4
 """A small positive constant used for numerical stability."""
 
 class EquationType(Enum):
