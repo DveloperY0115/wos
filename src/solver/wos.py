@@ -46,16 +46,16 @@ def wos_walk(
         dist_abs = ti.abs(dist)
 
         # Accumulate source term if necessary
-        if eqn_type == EquationType.LAPLACE:
+        if eqn_type == EquationType.laplace:
             pass  # Do nothing
 
-        elif eqn_type == EquationType.POISSON:
+        elif eqn_type == EquationType.poisson:  # FIXME: Numerical issue
             src_pt = uniform_ball(dist_abs, curr_pt)
             src_val = scene.query_source(src_pt)
             v_ball = volume_ball(dist_abs)
             sol += v_ball * src_val * harmonic_green_3d(curr_pt, src_pt, dist_abs)
 
-        elif eqn_type == EquationType.SCREENED_POISSON:
+        elif eqn_type == EquationType.screened_poisson:  # FIXME: Numerical issue
             src_pt = uniform_ball(dist_abs, curr_pt)
             src_val = scene.query_source(src_pt)
             v_ball = volume_ball(dist_abs)
@@ -79,7 +79,7 @@ def wos_walk(
     # Retrieve the boundary value
     bd_val = scene.query_boundary(curr_pt)
 
-    if eqn_type == EquationType.SCREENED_POISSON:
+    if eqn_type == EquationType.screened_poisson:
         sol += norm * bd_val
     else:
         sol += bd_val
