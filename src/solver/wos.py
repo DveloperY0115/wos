@@ -45,6 +45,10 @@ def wos_walk(
         dist = scene.query_dist(curr_pt)
         dist_abs = ti.abs(dist)
 
+        # Terminate the walk when reached boundary
+        if dist_abs < eps:
+            break
+
         # Accumulate source term if necessary
         if eqn_type == EquationType.laplace:
             pass  # Do nothing
@@ -67,10 +71,6 @@ def wos_walk(
 
         else:
             pass  # FIXME: Need to raise error, but Taichi does not support it
-
-        # Terminate the walk when reached boundary
-        if dist_abs < eps:
-            break
 
         # Sample a random point on a sphere whose
         # radius is the distance to the closest boundary point
