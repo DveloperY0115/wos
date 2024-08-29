@@ -23,8 +23,8 @@ from src.utils.constants import EquationType
 
 
 # Initialize Taichi
-# ti.init(arch=ti.gpu, debug=True)
-ti.init(arch=ti.gpu)
+ti.init(arch=ti.gpu, debug=True)
+# ti.init(arch=ti.gpu)
 
 @dataclass
 class Args:
@@ -150,8 +150,12 @@ def main(args: Args) -> None:
                 ti.tools.imwrite(sol_vis, str(args.out_dir / f"sol_{walk_idx+1:04d}.png"))
 
     # Save the query points and solution
-    np.save(args.out_dir / "xyz.npy", query_pts.to_numpy())
-    np.save(args.out_dir / f"sol_n-walk-{args.n_walk}.npy", total_sol)
+    out = {
+        "xyz": query_pts.to_numpy(),
+        "sol": total_sol.flatten(),
+        "scene_shape": (args.img_height, args.img_width),
+    }
+    np.savez(args.out_dir / "result.npz", **out)
 
 
 if __name__ == "__main__":
