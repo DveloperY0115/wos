@@ -34,17 +34,17 @@ The last panel shows the solution with a boundary condition defined over a trian
     <tr>
         <td>
             <figure>
-                <img src="./media/sphere_heat_boundary.gif", width="378px">
+                <img src="./media/sphere_heat_boundary.gif", width="252px">
             </figure>
         </td>
         <td>
             <figure>
-                <img src="./media/sphere_heat_source.gif", width="378px">
+                <img src="./media/sphere_heat_source.gif", width="252px">
             </figure>
         </td>
         <td>
             <figure>
-                <img src="./media/mesh_heat_boundary.gif", width="378px">
+                <img src="./media/mesh_heat_boundary.gif", width="252px">
             </figure>
         </td>
     </tr>
