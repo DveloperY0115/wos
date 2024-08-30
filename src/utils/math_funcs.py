@@ -20,14 +20,18 @@ def sinh(x: float):
     """
     Computes the hyperbolic sine of the input value.
     """
-    return 0.5 * (tm.exp(x) - tm.exp(-x))
+    out = 0.5 * (tm.exp(x) - tm.exp(-x))
+    assert not (tm.isnan(out) or tm.isinf(out)), f"NaN encountered for input {x}."
+    return out
 
 @ti.func
 def cosh(x: float):
     """
     Computes the hyperbolic cosine of the input value.
     """
-    return 0.5 * (tm.exp(x) + tm.exp(-x))
+    out = 0.5 * (tm.exp(x) + tm.exp(-x))
+    assert not (tm.isnan(out) or tm.isinf(out)), f"NaN encountered for input {x}."
+    return out
 
 @ti.func
 def volume_ball(radius: float):
@@ -49,8 +53,9 @@ def harmonic_green_2d(x: tm.vec2, y: tm.vec2, R: float):
     """
     R_ = R + EPS
     val = (1 / (2 * np.pi)) * tm.log(R_ / (tm.length(x - y) + EPS))
-    if tm.isnan(val) or tm.isinf(val):
-        val = 0.0
+    assert not (tm.isnan(val) or tm.isinf(val)), (
+        f"The potential value is NaN."
+    )
     return val
 
 @ti.func
@@ -74,6 +79,9 @@ def harmonic_green_3d(
         r = R / 2.0
     assert r < R, f"'r' must be less than 'R'. Got {r} and {R}."
     val = (1 / (4 * np.pi)) * (1 / r - 1 / R)
+    assert not (tm.isnan(val) or tm.isinf(val)), (
+        f"The potential value is NaN."
+    )
     return val
 
 @ti.func
@@ -84,7 +92,13 @@ def yukawa_potential_2d(x: tm.vec2, y: tm.vec2, R: float, c: float):
     raise NotImplementedError("TODO")
 
 @ti.func
-def yukawa_potential_3d(x: tm.vec3, y: tm.vec3, R: float, c: float):
+def yukawa_potential_3d(
+    x: tm.vec3,
+    y: tm.vec3,
+    R: float,
+    c: float,
+    r_clamp: float = 1e-4,
+):
     """
     Computes the Yukawa potential defined in 3D space and the normalizer.
     """
@@ -92,13 +106,19 @@ def yukawa_potential_3d(x: tm.vec3, y: tm.vec3, R: float, c: float):
     assert c > 0.0, f"The parameter 'c' must be positive. Got {c}."
 
     # Compute potential
-    R_ = R + EPS
-    r = tm.length(x - y) + EPS
-    val = (1 / (4 * np.pi)) * ((sinh((R_ - r) * tm.sqrt(c))) / (r * sinh(R_ * tm.sqrt(c))))
-    if tm.isnan(val) or tm.isinf(val):  # TODO: Why NaNs..?
-        val = 0.0
+    r = safe_length(y - x, r_clamp)
+    if r >= R:
+        r = R / 2.0
+    val = (1 / (4 * np.pi)) * ((sinh((R - r) * tm.sqrt(c))) / (r * sinh(R * tm.sqrt(c))))
 
     # Compute normalizer
-    normalizer = (R_ * tm.sqrt(c)) / (sinh(R_ * tm.sqrt(c)) + EPS)
+    normalizer = (R * tm.sqrt(c)) / (sinh(R * tm.sqrt(c)) + EPS)
+    
+    assert not (tm.isnan(val) or tm.isinf(val)), (
+        f"The potential value is NaN."
+    )
+    assert not (tm.isnan(normalizer) or tm.isinf(normalizer)), (
+        f"The normalizer is NaN."
+    )
 
     return val, normalizer
