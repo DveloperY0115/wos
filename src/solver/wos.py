@@ -39,18 +39,14 @@ def wos_walk(
 
     sol = 0.0
     norm = 1.0  # Normalization constant used in Screened Poisson's equation
-    is_outside = False
     for step_idx in range(n_step):
 
         # Compute the distance to the closest boundary point
         dist = scene.query_dist(curr_pt)
-
-        if step_idx == 0:  # Check whether the initial point is outside
-            is_outside = dist > 0.0
         dist_abs = ti.abs(dist)
 
         # Terminate the walk when reached boundary
-        if dist_abs < eps or is_outside:
+        if dist_abs < eps:
             break
 
         # Accumulate source term if necessary
@@ -81,9 +77,7 @@ def wos_walk(
         curr_pt = uniform_sphere(dist_abs, curr_pt)
 
     # Retrieve the boundary value
-    bd_val = 0.0
-    if not is_outside:
-        bd_val = scene.query_boundary(curr_pt)
+    bd_val = scene.query_boundary(curr_pt)
 
     if eqn_type == EquationType.screened_poisson:
         sol += norm * bd_val
