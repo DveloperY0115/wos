@@ -18,6 +18,7 @@ from ..utils.sampling import (
     uniform_sphere,
 )
 from ..utils.taichi_types import (
+    Int1DArray,
     Float1DArray,
     Scene,
     VectorField,
@@ -31,6 +32,7 @@ def wos_walk(
     n_step: int,
     eps: float,
     eqn_type: ti.template(),  # FIXME: Need to add a proper type hint
+    fetch_clst_bd: bool = True,
 ):
     """
     Takes a single step of the Walk-on-Spheres algorithm.
@@ -39,14 +41,22 @@ def wos_walk(
 
     sol = 0.0
     norm = 1.0  # Normalization constant used in Screened Poisson's equation
+    outside = False
+    terminated = False
     for step_idx in range(n_step):
 
         # Compute the distance to the closest boundary point
         dist = scene.query_dist(curr_pt)
         dist_abs = ti.abs(dist)
 
+        # Terminate the walk when outside the domain
+        if step_idx == 0 and dist > 0.0:
+            outside = True
+            break
+
         # Terminate the walk when reached boundary
         if dist_abs < eps:
+            terminated = True
             break
 
         # Accumulate source term if necessary
@@ -77,15 +87,20 @@ def wos_walk(
         curr_pt = uniform_sphere(dist_abs, curr_pt)
 
     # Retrieve the boundary value
-    bd_val = scene.query_boundary(curr_pt)
-
-    if eqn_type == EquationType.screened_poisson:
-        sol += norm * bd_val
+    if outside:
+        bd_val = 0.0
     else:
-        sol += bd_val
+        # NOTE: Fetch the boundary value if either:
+        # - The walk reached the boundary and terminated
+        # - The walk did not reach the boundary but we want to fetch the closest boundary value
+        if terminated or fetch_clst_bd:
+            bd_val = scene.query_boundary(curr_pt)
+            if eqn_type == EquationType.screened_poisson:
+                sol += norm * bd_val
+            else:
+                sol += bd_val
 
-    return sol
-
+    return sol, terminated
 
 @ti.kernel
 def wos(
@@ -95,6 +110,7 @@ def wos(
     n_step: int,
     eqn_type: ti.template(),  # FIXME: Need to add a proper type hint
     sol_: Float1DArray,
+    term_mask_: Int1DArray,
 ):
     """
     Simulates the Walk-on-Spheres algorithm.
@@ -103,7 +119,8 @@ def wos(
     - n_step: The number of maximum steps for each random walk
     """
     for i in range(query_pts.shape[0]):  # Parallelized
-        curr_sol = wos_walk(
+        curr_sol, terminated = wos_walk(
             query_pts[i], scene, n_step, eps, eqn_type
         )
         sol_[i] = curr_sol
+        term_mask_[i] = 1 if terminated else 0
