@@ -18,6 +18,7 @@ from typeguard import typechecked
 import tyro
 
 from src.geometry.sphere import Sphere
+from src.solver.solver import Solver
 from src.solver.wos import wos
 from src.utils.constants import EquationType
 
@@ -25,6 +26,7 @@ from src.utils.constants import EquationType
 # Initialize Taichi
 ti.init(arch=ti.gpu, debug=True)
 # ti.init(arch=ti.gpu)
+
 
 @dataclass
 class Args:
@@ -65,6 +67,12 @@ def main(args: Args) -> None:
         radius=args.radius,
     )
 
+    # Initialize solver
+    solver = Solver(
+        type="wos",
+        cache=None,
+    )
+
     # Initialize query points
     xs = np.linspace(-2.0, 2.0, args.img_width)
     ys = np.linspace(-2.0, 2.0, args.img_height)
@@ -93,6 +101,7 @@ def main(args: Args) -> None:
 
                 # Allocate memory for the solution obtained from this walk
                 curr_sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
+                curr_mask = ti.ndarray(dtype=ti.i32, shape=(query_pts.shape[0]))
 
                 # Random walk
                 wos(
@@ -102,9 +111,12 @@ def main(args: Args) -> None:
                     args.n_step,
                     args.eqn_type,
                     curr_sol,
+                    curr_mask,
                 )
                 curr_sol = curr_sol.to_numpy()
                 curr_sol = curr_sol.reshape(args.img_height, args.img_width)
+                curr_mask = curr_mask.to_numpy()
+                curr_mask = curr_mask.reshape(args.img_height, args.img_width)
 
                 # Compute the cumulative average
                 total_sol = (curr_sol + (walk_idx + 1) * total_sol) / (walk_idx + 2)
@@ -118,36 +130,18 @@ def main(args: Args) -> None:
 
                 # time.sleep(max(args.vis_every, 0.0))
     else:
-        for walk_idx in tqdm(range(args.n_walk)):
-
-            # Allocate memory for the solution obtained from this walk
-            curr_sol = ti.ndarray(dtype=ti.f32, shape=(query_pts.shape[0]))
-
-            # Random walk
-            wos(
-                query_pts,
-                sphere,
-                args.eps,
-                args.n_step,
-                args.eqn_type,
-                curr_sol,
-            )
-            curr_sol = curr_sol.to_numpy()
-            curr_sol = curr_sol.reshape(args.img_height, args.img_width)
-
-            # Compute the cumulative average
-            total_sol = (curr_sol + (walk_idx + 1) * total_sol) / (walk_idx + 2)
-            assert not np.any(np.isnan(total_sol)), "NaN detected in the solution"
-            assert not np.any(np.isinf(total_sol)), "Inf detected in the solution"
-
-            ####
-            print(walk_idx, f"{np.min(total_sol):.3f}", f"{np.max(total_sol):.3f}")
-            ####
-
-            # Visualize the solution
-            if (walk_idx + 1) % args.vis_every == 0:
-                sol_vis = plt.cm.coolwarm(plt.Normalize()(total_sol))
-                ti.tools.imwrite(sol_vis, str(args.out_dir / f"sol_{walk_idx+1:04d}.png"))
+        query_pts, total_sol = solver.solve(
+            query_pts,
+            sphere,
+            args.img_height,
+            args.img_width,
+            args.eps,
+            args.n_step,
+            args.eqn_type,
+            args.n_walk,
+            args.vis_every,
+            args.out_dir,
+        )
 
     # Save the query points and solution
     out = {
@@ -156,6 +150,7 @@ def main(args: Args) -> None:
         "scene_shape": (args.img_height, args.img_width),
     }
     np.savez(args.out_dir / "result.npz", **out)
+    print(f"Results saved to: {args.out_dir / 'result.npz'}")
 
 
 if __name__ == "__main__":
